@@ -2,6 +2,7 @@
 /* eslint-disable class-methods-use-this */
 import 'bootstrap';
 import cards from './cards';
+// import Card from './card';
 
 class Game {
   constructor() {
@@ -38,21 +39,22 @@ class Game {
       eighth_card: cards[9],
     };
 
-    this.button_area = this.createBlock();
-    this.score_area = this.createBlock();
-    this.button_for_game_start = this.createBlock('button');
+    // this.button_area = this.createBlock();
+    // this.score_area = this.createBlock();
+    // this.button_for_game_start = this.createBlock('button');
 
-    this.isOpen = false;
-    this.page_audio_arr = [];
-    this.needed_information = {};
-    this.first_time = true;
-    this.total_mistakes = 0;
-    this.number_of_tries = 0;
-    this.victory = './audio/correct.mp3';
-    this.lose = './audio/error.mp3';
-    this.hidden_menu = this.createBlock();
+    // this.isOpen = false;
+    // this.page_audio_arr = [];
+    // this.needed_information = {};
+    // this.first_time = true;
+    // this.total_mistakes = 0;
+    // this.number_of_tries = 0;
+    // this.victory = './audio/correct.mp3';
+    // this.lose = './audio/error.mp3';
+    // this.hidden_menu = this.createBlock();
   }
 
+  // make Base Container for app
   setMainWrapper() {
     this.main_wrapper.classList.add('container-fluid');
     this.header.classList.add('row');
@@ -78,9 +80,8 @@ class Game {
     // this.body.appendChild(this.button_area);
   }
 
+  // make Base Main container for cards
   setMain() {
-    this.cleanGameZone();
-
     this.main.classList.add('row', 'row-cols-1', 'row-cols-md-2', 'row-cols-lg-3', 'row-cols-xl-4', 'justify-content-center', 'align-items-center');
 
     for (let i = 0; i < 8; i++) {
@@ -90,15 +91,16 @@ class Game {
       const cardBody = this.createBlock();
       const link = this.createBlock('a');
 
-      cardWrapper.classList.add('col', 'mb-2');
-      card.classList.add('card');
+      cardWrapper.classList.add('col', 'mb-2', 'card_wrapper');
+      card.classList.add('card', 'card-main');
+      card.dataset.sectionId = `${i}`;
       img.classList.add('card-img-top');
       cardBody.classList.add('card-body', 'text-center');
       link.classList.add('h4', 'card-title', 'text-info');
 
-      console.log(this.sections.img[i]);
       img.src = `${this.baseUrl}${this.sections.img[i]}`;
       link.innerHTML = this.sections.name[i];
+
       cardBody.append(link);
       card.append(img);
       card.append(cardBody);
@@ -106,31 +108,76 @@ class Game {
       this.main.append(cardWrapper);
     }
 
-    // this.button_for_game_start.classList.add('button_for_game_start');
-    // this.button_for_game_start.innerText = 'START GAME';
+    this.main_wrapper.append(this.main);
+    this.giveEventHandlerToSection();
+  }
 
-    // if (gameMode) {
-    //   this.cleanGameZone();
-    //   arr.map((el) => {
-    //     card.id = el.word;
-    //     card.setAttribute('data-audio', `${el.audioSrc}`);
-    //     img.src = el.image;
-    //     img.classList.add('big_img', 'full_picture');
-    //   });
-    //   this.button_area.appendChild(this.button_for_game_start);
-    //   this.button_for_game_start.classList.remove('hide_button');
-    //   this.toggler.classList.remove('unclickable');
-    //   this.main.classList.add('unclickable');
-    // }else{
-    //   this.cleanGameZone();
-    //   arr.map((el) => {
-    //     card.id = el.word;
-    //     card.setAttribute('data-audio', `${el.audioSrc}`);
-    //     img.src = el.image;
-    //     img.classList.add('big_img', 'full_picture');
-    //   });
-    // }
+  // give event handler to sections on main page
+  giveEventHandlerToSection() {
+    const c = this;
+    Array.from(document.querySelectorAll('.card_wrapper')).forEach((section, i) => {
+      section.addEventListener('click', () => {
+        c.cleanGameZone();
+        c.getSection(cards[i + 2]);
+      });
+    });
+  }
 
+  // make cards page per section
+  getSection(section) {
+    const cardsPerPage = section;
+    // console.log(cardsPerPage);
+
+    this.main.classList.add('row', 'row-cols-1', 'row-cols-md-2', 'row-cols-lg-3', 'row-cols-xl-4', 'justify-content-center', 'align-items-center');
+
+    const goBack = this.createBlock();
+    goBack.classList.add('btn', 'btn-info', 'col-2', 'go-back');
+    goBack.innerHTML = 'Go Back';
+
+    const c = this;
+
+    for (let i = 0; i < cardsPerPage.length; i++) {
+      const cardWrapper = this.createBlock();
+      const card = this.createBlock();
+      const img = this.createBlock('img');
+      const cardBody = this.createBlock();
+      const textFront = this.createBlock();
+      const rotate = this.createBlock('img');
+
+      cardWrapper.classList.add('col', 'mb-2');
+      card.classList.add('card');
+      card.dataset.cardAudio = `${cardsPerPage[i].audioSrc}`;
+      img.classList.add('card-img-top');
+      cardBody.classList.add('row', 'card-body', 'text-center');
+      textFront.classList.add('h4', 'col', 'card-title', 'text-info');
+      rotate.classList.add('img', 'col-2', 'rotate');
+
+      card.addEventListener('click', () => {
+        c.getVoice(`${c.baseUrl}${cardsPerPage[i].audioSrc}`);
+      });
+      rotate.addEventListener('click', () => {
+        c.getVoice(`${c.baseUrl}${cardsPerPage[i].audioSrc}`);
+      });
+
+      // console.log(this.sections.img[i]);
+      // console.log(card.dataset.sectionId);
+
+      img.src = `${this.baseUrl}${cardsPerPage[i].image}`;
+      textFront.innerHTML = cardsPerPage[i].word;
+      rotate.src = `${this.baseUrl}img/rotate.png`;
+      cardBody.append(textFront);
+      cardBody.append(rotate);
+      card.append(img);
+      card.append(cardBody);
+      cardWrapper.append(card);
+      this.main.append(cardWrapper);
+    }
+
+    this.main.append(goBack);
+    // const c = this;
+    goBack.addEventListener('click', () => {
+      c.backHandler();
+    });
     this.main_wrapper.append(this.main);
   }
 
@@ -142,6 +189,7 @@ class Game {
 
   }
 
+  // generate Element to append
   createBlock(el) {
     if (!el) {
       el = 'div';
@@ -149,14 +197,17 @@ class Game {
     return document.createElement(el);
   }
 
-  start() {
-
+  // clean Base Main container for cards
+  cleanGameZone() {
+    while (this.main.firstChild) {
+      this.main.removeChild(this.main.firstChild);
+    }
   }
 
-  cleanGameZone() {
-    this.main.innerHTML = '';
-    // this.button_area.innerHTML = '';
-    // this.score_area.innerHTML = '';
+  // go back to main page
+  backHandler() {
+    this.cleanGameZone();
+    this.setMain();
   }
 
   reloadPage() {
@@ -164,6 +215,10 @@ class Game {
   }
 
   playAudio(url) {
+    new Audio(url).play();
+  }
+
+  getVoice(url) {
     new Audio(url).play();
   }
 }

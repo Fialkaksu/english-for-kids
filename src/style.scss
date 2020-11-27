@@ -8,12 +8,22 @@ body {
   background-color: $body-bg;
 }
 .card {
-  background: linear-gradient(180deg, #0099ae, #c7fa3a 40%, #fff 0, #fff);
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  transition: all 1s;
+  &:hover {
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.3), 0 4px 20px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+}
+.card-main {
+  background: linear-gradient(180deg, #f17f33, #c7fa3a 40%, #fff 0, #fff);
   font-size: 24px;
   perspective: 1000px;
-  transition: transform 0.6s;
+  // transition: transform 0.6s;
   transform-style: preserve-3d;
+  &:hover {
+    background: linear-gradient(180deg, #0099ae, #c7fa3a 77%, #fff 0, #fff);
+  }
   img {
     width: 160px;
     height: 160px;
@@ -29,15 +39,16 @@ body {
   height: 230px;
   object-fit: cover;
 }
-.back{
+.back {
   transform: rotateY(180deg);
   backface-visibility: hidden;
   transition: 0.3s;
 }
-.unclickable{
+
+.unclickable {
   pointer-events: none;
 }
-.hide_button{
+.hide_button {
   opacity: 0;
 }
 
