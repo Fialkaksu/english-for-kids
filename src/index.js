@@ -1,5 +1,5 @@
-import Game from './modules/game';
 import 'bootstrap';
+import Game from './modules/game';
 
 const game = new Game();
 

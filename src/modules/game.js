@@ -9,7 +9,7 @@ class Game {
     this.body = document.querySelector('body');
     this.main_wrapper = this.createBlock();
 
-    this.header = this.createBlock();
+    this.header = this.createBlock('header');
     this.nav_icon = this.createBlock();
     this.toggler = this.createBlock();
 
@@ -22,22 +22,28 @@ class Game {
     // this.cardBody = this.createBlock();
     // this.link = this.createBlock('a');
 
-    this.baseUrl = '../assets/';
+    this.baseUrl = '../../assets/';
 
     this.sections = {
       name: cards[0],
       img: cards[1],
     };
-    this.dictionary = {
-      first_card: cards[2],
-      second_card: cards[3],
-      third_card: cards[4],
-      fourth_card: cards[5],
-      fifth_card: cards[6],
-      sixth_card: cards[7],
-      seventh_card: cards[8],
-      eighth_card: cards[9],
-    };
+    this.allCards = cards;
+
+    this.menu = document.createElement('nav');
+    this.isOpen = false;
+
+    this.game_mode = false;
+    // this.dictionary = {
+    //   first_card: cards[2],
+    //   second_card: cards[3],
+    //   third_card: cards[4],
+    //   fourth_card: cards[5],
+    //   fifth_card: cards[6],
+    //   sixth_card: cards[7],
+    //   seventh_card: cards[8],
+    //   eighth_card: cards[9],
+    // };
 
     // this.button_area = this.createBlock();
     // this.score_area = this.createBlock();
@@ -51,20 +57,19 @@ class Game {
     // this.number_of_tries = 0;
     // this.victory = './audio/correct.mp3';
     // this.lose = './audio/error.mp3';
-    // this.hidden_menu = this.createBlock();
   }
 
   // make Base Container for app
   setMainWrapper() {
     this.main_wrapper.classList.add('container-fluid');
-    this.header.classList.add('row');
-    this.nav_icon.classList.add('col-2', 'nav-icon');
+    this.header.classList.add('row', 'text-right', 'p-3');
+    this.nav_icon.classList.add('col-1', 'nav-icon');
     this.nav_icon.innerHTML = `
-      <span>menu</span>
-      <span>menu</span>
-      <span>menu</span>
+      <span></span>
+      <span></span>
+      <span></span>
     `;
-    this.toggler.classList.add('col-10', 'toggler');
+    this.toggler.classList.add('col', 'toggler');
     this.toggler.innerHTML = `
       <label class="switch">
         <input type="checkbox" id="togBtn">
@@ -78,6 +83,9 @@ class Game {
     this.main_wrapper.append(this.header);
     this.body.append(this.main_wrapper);
     // this.body.appendChild(this.button_area);
+
+    this.createNavigation();
+    this.navIconHandler();
   }
 
   // make Base Main container for cards
@@ -121,6 +129,14 @@ class Game {
         c.getSection(cards[i + 2]);
       });
     });
+
+    // give event handler to sections on main page
+    Array.from(document.querySelectorAll('.nav_item')).forEach((section, i) => {
+      section.addEventListener('click', () => {
+        c.cleanGameZone();
+        c.getSection(cards[i + 2]);
+      });
+    });
   }
 
   // make cards page per section
@@ -151,12 +167,25 @@ class Game {
       cardBody.classList.add('row', 'card-body', 'text-center');
       textFront.classList.add('h4', 'col', 'card-title', 'text-info');
       rotate.classList.add('img', 'col-2', 'rotate');
+      // rotate.id = 'rotate';
 
       card.addEventListener('click', () => {
         c.getVoice(`${c.baseUrl}${cardsPerPage[i].audioSrc}`);
       });
+
       rotate.addEventListener('click', () => {
-        c.getVoice(`${c.baseUrl}${cardsPerPage[i].audioSrc}`);
+        if (this.game_mode) {
+          console.log('game_mode ON');
+        } else {
+          console.log('game_mode OFF');
+          c.getVoice(`${c.baseUrl}${cardsPerPage[i].audioSrc}`);
+          textFront.innerHTML = cardsPerPage[i].translation;
+          cardWrapper.classList.toggle('rotation');
+          cardWrapper.addEventListener('mouseleave', () => {
+            cardWrapper.classList.remove('rotation');
+            textFront.innerHTML = cardsPerPage[i].word;
+          });
+        }
       });
 
       // console.log(this.sections.img[i]);
@@ -178,7 +207,66 @@ class Game {
     goBack.addEventListener('click', () => {
       c.backHandler();
     });
+
     this.main_wrapper.append(this.main);
+    this.main.addEventListener('click', () => {
+      if (this.isOpen === true && event.target.classList !== 'nav-icon' && event.target.id !== 'hidden_menu') {
+        this.nav_icon.classList.toggle('open');
+        this.menu.classList.toggle('dark_side_hidden');
+        this.isOpen = false;
+      }
+    });
+  }
+
+  // create navigation menu for sections
+  createNavigation() {
+    this.menu.classList.add('navbar-nav', 'dark_side_of_navigation', 'dark_side_hidden', 'pt-5', 'pl-5');
+    this.menu.id = 'hidden_menu';
+
+    for (let i = 0; i < 9; i++) {
+      const navItem = this.createBlock('a');
+      navItem.classList.add('nav-link', 'text-info', 'h4');
+      navItem.style.cursor = 'pointer';
+      navItem.dataset.navId = `${i}`;
+      navItem.innerHTML = this.sections.name[i];
+      if (i === 8) {
+        navItem.innerHTML = 'Statistic';
+        navItem.classList.add('stat');
+      } else {
+        navItem.classList.add('nav_item');
+      }
+      this.menu.append(navItem);
+    }
+
+    this.body.append(this.menu);
+
+    this.menuHandler();
+  }
+
+  navIconHandler() {
+    this.nav_icon.addEventListener('click', () => {
+      if (this.isOpen) {
+        this.nav_icon.classList.toggle('open');
+        this.menu.classList.toggle('dark_side_hidden');
+        this.isOpen = false;
+        return;
+      }
+      this.nav_icon.classList.toggle('open');
+      this.menu.classList.toggle('dark_side_hidden');
+      this.isOpen = true;
+    });
+  }
+
+  menuHandler() {
+    this.menu.addEventListener('click', () => {
+      this.hideMenu();
+      this.isOpen = false;
+    });
+  }
+
+  hideMenu() {
+    this.nav_icon.classList.toggle('open');
+    this.menu.classList.toggle('dark_side_hidden');
   }
 
   setButtonArea() {
@@ -212,10 +300,6 @@ class Game {
 
   reloadPage() {
     window.location.reload();
-  }
-
-  playAudio(url) {
-    new Audio(url).play();
   }
 
   getVoice(url) {
