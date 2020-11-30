@@ -3,6 +3,9 @@
 // Ваши переназначения
 $body-bg: rgb(246, 253, 180);
 $body-color: #111;
+$orange: #f17f33;
+$yellow-green: #c7fa3a;
+$sea: #0099ae;
 
 body {
   background-color: $body-bg;
@@ -16,13 +19,13 @@ body {
   }
 }
 .card-main {
-  background: linear-gradient(180deg, #f17f33, #c7fa3a 40%, #fff 0, #fff);
+  background: linear-gradient(180deg, $orange, $yellow-green 40%, #fff 0, #fff);
   font-size: 24px;
   perspective: 1000px;
-  // transition: transform 0.6s;
+  transition: transform 0.6s;
   transform-style: preserve-3d;
   &:hover {
-    background: linear-gradient(180deg, #0099ae, #c7fa3a 77%, #fff 0, #fff);
+    background: linear-gradient(180deg, $sea, $yellow-green 77%, #fff 0, #fff);
   }
   img {
     width: 160px;
@@ -39,6 +42,20 @@ body {
   height: 230px;
   object-fit: cover;
 }
+
+.rotation {
+  transform: rotateY(180deg);
+  img{
+    // transform: rotateY(180deg);
+  }
+  .card-title{
+    transform: rotateY(180deg);
+  }
+  .rotate{
+    visibility: hidden;
+  }
+}
+
 .back {
   transform: rotateY(180deg);
   backface-visibility: hidden;
@@ -50,6 +67,191 @@ body {
 }
 .hide_button {
   opacity: 0;
+}
+
+.dark_side_of_navigation {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 300px;
+  height: 100vh;
+  background: linear-gradient(40deg, $orange, $yellow-green);
+  display: block;
+  z-index: 1;
+  transition-duration: 0.3s;
+}
+
+.dark_side_hidden {
+  left: -300px;
+}
+
+.naw_item {
+  // margin-top: 82px;
+  // margin-left: 71px;
+  // cursor: pointer;
+}
+
+.burger.menu {
+  // z-index: 2;
+}
+
+.povorot {
+  // transform: rotate(90deg);
+  // transition-duration: 0.3s;
+}
+
+.active {
+  // text-decoration: underline;
+}
+
+// train/play toggle
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  height: 34px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(40deg, $yellow-green, $orange);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background: linear-gradient(40deg, $yellow-green, $sea);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(85px);
+}
+
+.slider:after {
+  content: "TRAIN";
+  color: white;
+  display: block;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  font-size: 10px;
+  font-family: Verdana, sans-serif;
+}
+
+input:checked + .slider:after {
+  content: "GAME";
+}
+
+/* Burger menu */
+
+.nav-icon {
+  width: 60px;
+  height: 45px;
+  position: relative;
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  transform: rotate(0deg);
+  -webkit-transition: 0.5s ease-in-out;
+  -moz-transition: 0.5s ease-in-out;
+  -o-transition: 0.5s ease-in-out;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.nav-icon span {
+  display: block;
+  position: absolute;
+  height: 9px;
+  width: 100%;
+  background: linear-gradient(180deg, #fd6a63, #feb46b);
+  border-radius: 9px;
+  opacity: 1;
+  left: 0;
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  transform: rotate(0deg);
+  -webkit-transition: 0.25s ease-in-out;
+  -moz-transition: 0.25s ease-in-out;
+  -o-transition: 0.25s ease-in-out;
+  transition: 0.25s ease-in-out;
+}
+
+.nav-icon span:nth-child(1) {
+  top: 0px;
+  -webkit-transform-origin: left center;
+  -moz-transform-origin: left center;
+  -o-transform-origin: left center;
+  transform-origin: left center;
+}
+
+.nav-icon span:nth-child(2) {
+  top: 18px;
+  -webkit-transform-origin: left center;
+  -moz-transform-origin: left center;
+  -o-transform-origin: left center;
+  transform-origin: left center;
+}
+
+.nav-icon span:nth-child(3) {
+  top: 36px;
+  -webkit-transform-origin: left center;
+  -moz-transform-origin: left center;
+  -o-transform-origin: left center;
+  transform-origin: left center;
+}
+
+.nav-icon.open span:nth-child(1) {
+  width: 50px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.nav-icon.open span:nth-child(2) {
+  width: 0%;
+  opacity: 0;
+}
+
+.nav-icon.open span:nth-child(3) {
+  width: 50px;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
 }
 
 /* :root {
