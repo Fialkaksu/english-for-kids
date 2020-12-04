@@ -12,6 +12,9 @@ class Game {
     this.header = this.createBlock('header');
     this.nav_icon = this.createBlock();
     this.toggler = this.createBlock();
+    this.switch = this.createBlock('label');
+    this.checkBox = this.createBlock('input');
+    this.slider = this.createBlock();
 
     this.main = this.createBlock('main');
 
@@ -22,7 +25,7 @@ class Game {
     // this.cardBody = this.createBlock();
     // this.link = this.createBlock('a');
 
-    this.baseUrl = '../../assets/';
+    this.baseUrl = './assets/';
 
     this.sections = {
       name: cards[0],
@@ -34,6 +37,7 @@ class Game {
     this.isOpen = false;
 
     this.game_mode = false;
+
     // this.dictionary = {
     //   first_card: cards[2],
     //   second_card: cards[3],
@@ -70,13 +74,20 @@ class Game {
       <span></span>
     `;
     this.toggler.classList.add('col', 'toggler');
-    this.toggler.innerHTML = `
-      <label class="switch">
-        <input type="checkbox" id="togBtn">
-        <div class="slider round unclickable" id="toggler"></div>
-      </label>
-    `;
-    // this.button_area.classList.add('row', 'row-cols-1');
+    // this.toggler.innerHTML = `
+    //   <label class="switch">
+    //     <input type="checkbox" id="togBtn">
+    //     <div class="slider round" id="toggler"></div>
+    //   </label>
+    // `;
+    this.switch.classList.add('switch');
+    this.checkBox.classList.add('togBtn');
+    // this.slider.classList.add('slider', 'train', 'unclickable');
+    this.slider.classList.add('slider', 'train');
+
+    this.switch.appendChild(this.checkBox);
+    this.switch.appendChild(this.slider);
+    this.toggler.append(this.switch);
 
     this.header.append(this.nav_icon);
     this.header.append(this.toggler);
@@ -86,11 +97,33 @@ class Game {
 
     this.createNavigation();
     this.navIconHandler();
+    this.modeHandler();
+  }
+
+  modeHandler() {
+    const c = this;
+
+    this.slider.addEventListener('click', () => {
+      c.slider.classList.toggle('game');
+      if (c.game_mode) {
+        c.game_mode = false;
+        console.log(`game_mode ${c.game_mode}`);
+      } else {
+        c.game_mode = true;
+        console.log(`game_mode ${c.game_mode}`);
+      }
+
+      if (c.main.id) {
+        c.cleanGameZone();
+        c.getSection(cards[Number(c.main.id)], c.game_mode);
+      }
+      // this.getSection(this.game_mode);
+    });
   }
 
   // make Base Main container for cards
   setMain() {
-    this.main.classList.add('row', 'row-cols-1', 'row-cols-md-2', 'row-cols-lg-3', 'row-cols-xl-4', 'justify-content-center', 'align-items-center');
+    this.main.classList.add('row', 'row-cols-1', 'row-cols-md-2', 'row-cols-lg-3', 'row-cols-xl-4', 'justify-content-center', 'align-items-center', 'main_page');
 
     for (let i = 0; i < 8; i++) {
       const cardWrapper = this.createBlock();
@@ -126,7 +159,7 @@ class Game {
     Array.from(document.querySelectorAll('.card_wrapper')).forEach((section, i) => {
       section.addEventListener('click', () => {
         c.cleanGameZone();
-        c.getSection(cards[i + 2]);
+        c.getSection(cards[i + 2], c.game_mode);
       });
     });
 
@@ -134,17 +167,18 @@ class Game {
     Array.from(document.querySelectorAll('.nav_item')).forEach((section, i) => {
       section.addEventListener('click', () => {
         c.cleanGameZone();
-        c.getSection(cards[i + 2]);
+        c.getSection(cards[i + 2], c.game_mode);
       });
     });
   }
 
   // make cards page per section
-  getSection(section) {
+  getSection(section, mode) {
     const cardsPerPage = section;
     // console.log(cardsPerPage);
 
-    this.main.classList.add('row', 'row-cols-1', 'row-cols-md-2', 'row-cols-lg-3', 'row-cols-xl-4', 'justify-content-center', 'align-items-center');
+    this.main.classList.add('row', 'row-cols-1', 'row-cols-md-2', 'row-cols-lg-3', 'row-cols-xl-4', 'justify-content-center', 'align-items-center', 'section_page');
+    this.main.id = cards.indexOf(section);
 
     const goBack = this.createBlock();
     goBack.classList.add('btn', 'btn-info', 'col-2', 'go-back');
@@ -152,32 +186,45 @@ class Game {
 
     const c = this;
 
-    for (let i = 0; i < cardsPerPage.length; i++) {
-      const cardWrapper = this.createBlock();
-      const card = this.createBlock();
-      const img = this.createBlock('img');
-      const cardBody = this.createBlock();
-      const textFront = this.createBlock();
-      const rotate = this.createBlock('img');
+    if (mode) {
+      for (let i = 0; i < cardsPerPage.length; i++) {
+        const cardWrapper = this.createBlock();
+        const card = this.createBlock();
+        const img = this.createBlock('img');
 
-      cardWrapper.classList.add('col', 'mb-2');
-      card.classList.add('card');
-      card.dataset.cardAudio = `${cardsPerPage[i].audioSrc}`;
-      img.classList.add('card-img-top');
-      cardBody.classList.add('row', 'card-body', 'text-center');
-      textFront.classList.add('h4', 'col', 'card-title', 'text-info');
-      rotate.classList.add('img', 'col-2', 'rotate');
-      // rotate.id = 'rotate';
+        cardWrapper.classList.add('col', 'mb-2', 'card_wrapper');
+        card.classList.add('card');
+        card.dataset.cardAudio = `${cardsPerPage[i].audioSrc}`;
+        img.classList.add('card-img');
 
-      card.addEventListener('click', () => {
-        c.getVoice(`${c.baseUrl}${cardsPerPage[i].audioSrc}`);
-      });
+        img.src = `${this.baseUrl}${cardsPerPage[i].image}`;
 
-      rotate.addEventListener('click', () => {
-        if (this.game_mode) {
-          console.log('game_mode ON');
-        } else {
-          console.log('game_mode OFF');
+        card.append(img);
+        cardWrapper.append(card);
+        this.main.append(cardWrapper);
+      }
+    } else {
+      for (let i = 0; i < cardsPerPage.length; i++) {
+        const cardWrapper = this.createBlock();
+        const card = this.createBlock();
+        const img = this.createBlock('img');
+        const cardBody = this.createBlock();
+        const textFront = this.createBlock();
+        const rotate = this.createBlock('img');
+
+        cardWrapper.classList.add('col', 'mb-2', 'card_wrapper');
+        card.classList.add('card');
+        card.dataset.cardAudio = `${cardsPerPage[i].audioSrc}`;
+        img.classList.add('card-img-top');
+        cardBody.classList.add('row', 'card-body', 'text-center');
+        textFront.classList.add('h4', 'col', 'card-title', 'text-info');
+        rotate.classList.add('img', 'col-2', 'rotate');
+
+        card.addEventListener('click', () => {
+          c.getVoice(`${c.baseUrl}${cardsPerPage[i].audioSrc}`);
+        });
+
+        rotate.addEventListener('click', () => {
           c.getVoice(`${c.baseUrl}${cardsPerPage[i].audioSrc}`);
           textFront.innerHTML = cardsPerPage[i].translation;
           cardWrapper.classList.toggle('rotation');
@@ -185,25 +232,22 @@ class Game {
             cardWrapper.classList.remove('rotation');
             textFront.innerHTML = cardsPerPage[i].word;
           });
-        }
-      });
+        });
 
-      // console.log(this.sections.img[i]);
-      // console.log(card.dataset.sectionId);
-
-      img.src = `${this.baseUrl}${cardsPerPage[i].image}`;
-      textFront.innerHTML = cardsPerPage[i].word;
-      rotate.src = `${this.baseUrl}img/rotate.png`;
-      cardBody.append(textFront);
-      cardBody.append(rotate);
-      card.append(img);
-      card.append(cardBody);
-      cardWrapper.append(card);
-      this.main.append(cardWrapper);
+        img.src = `${this.baseUrl}${cardsPerPage[i].image}`;
+        textFront.innerHTML = cardsPerPage[i].word;
+        rotate.src = `${this.baseUrl}img/rotate.png`;
+        cardBody.append(textFront);
+        cardBody.append(rotate);
+        card.append(img);
+        card.append(cardBody);
+        cardWrapper.append(card);
+        this.main.append(cardWrapper);
+      }
     }
 
     this.main.append(goBack);
-    // const c = this;
+
     goBack.addEventListener('click', () => {
       c.backHandler();
     });
