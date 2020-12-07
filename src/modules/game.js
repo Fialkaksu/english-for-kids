@@ -1,6 +1,10 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
 import 'bootstrap';
+import {
+  event,
+  isWindow
+} from 'jquery';
 import cards from './cards';
 // import Card from './card';
 
@@ -33,10 +37,17 @@ class Game {
     };
     this.allCards = cards;
 
-    this.menu = document.createElement('nav');
+    this.menu = this.createBlock('nav');
     this.isOpen = false;
 
     this.game_mode = false;
+    this.start_game = this.createBlock();
+    this.score_area = this.createBlock();
+
+    this.countWinStars = 0;
+    this.countLooseStars = 0;
+    this.winnerVoice = `${this.baseUrl}/audio/correct.mp3`;
+    this.looseVoice = `${this.baseUrl}/audio/error.mp3`;
 
     // this.dictionary = {
     //   first_card: cards[2],
@@ -53,7 +64,6 @@ class Game {
     // this.score_area = this.createBlock();
     // this.button_for_game_start = this.createBlock('button');
 
-    // this.isOpen = false;
     // this.page_audio_arr = [];
     // this.needed_information = {};
     // this.first_time = true;
@@ -117,7 +127,6 @@ class Game {
         c.cleanGameZone();
         c.getSection(cards[Number(c.main.id)], c.game_mode);
       }
-      // this.getSection(this.game_mode);
     });
   }
 
@@ -178,7 +187,7 @@ class Game {
     // console.log(cardsPerPage);
 
     this.main.classList.add('row', 'row-cols-1', 'row-cols-md-2', 'row-cols-lg-3', 'row-cols-xl-4', 'justify-content-center', 'align-items-center', 'section_page');
-    this.main.id = cards.indexOf(section);
+    this.main.id = cards.indexOf(cardsPerPage);
 
     const goBack = this.createBlock();
     goBack.classList.add('btn', 'btn-info', 'col-2', 'go-back');
@@ -187,6 +196,7 @@ class Game {
     const c = this;
 
     if (mode) {
+      // render cards for game mode
       for (let i = 0; i < cardsPerPage.length; i++) {
         const cardWrapper = this.createBlock();
         const card = this.createBlock();
@@ -194,8 +204,9 @@ class Game {
 
         cardWrapper.classList.add('col', 'mb-2', 'card_wrapper');
         card.classList.add('card');
-        card.dataset.cardAudio = `${cardsPerPage[i].audioSrc}`;
+        // card.dataset.cardAudio = `${cardsPerPage[i].audioSrc}`;
         img.classList.add('card-img');
+        img.dataset.cardAudio = `${cardsPerPage[i].audioSrc}`;
 
         img.src = `${this.baseUrl}${cardsPerPage[i].image}`;
 
@@ -203,7 +214,42 @@ class Game {
         cardWrapper.append(card);
         this.main.append(cardWrapper);
       }
+
+      // sets for start game
+      this.score_area.classList.add('border', 'border-warning');
+      this.start_game.classList.add('btn', 'btn-warning');
+      this.start_game.innerHTML = 'Start Game';
+      this.score_area.innerHTML = '';
+
+      this.main.append(this.score_area);
+      this.main.append(this.start_game);
+
+      const cardsToFind = new Set();
+      // let countWinStars = 0;
+      // let countLooseStars = 0;
+      let countStars = 0;
+      this.start_game.onclick = (event) => {
+        // console.log(this);
+        // console.log(event);
+        event.preventDefault();
+        let cardToFind = this.getRandomCard(cardsPerPage);
+        if (cardsToFind.has(cardToFind)) {
+          cardToFind = this.getRandomCard(cardsPerPage);
+        }
+        cardsToFind.add(cardToFind);
+        this.getVoice(`${this.baseUrl}${cardToFind.audioSrc}`);
+        this.checkCard(cardToFind);
+        // const check = this.checkCard(cardToFind);
+
+        if (countStars < 8) {
+          countStars += 1;
+          console.log(countStars);
+        } else {
+          console.log('Game Over');
+        }
+      };
     } else {
+      // render cards for train mode
       for (let i = 0; i < cardsPerPage.length; i++) {
         const cardWrapper = this.createBlock();
         const card = this.createBlock();
@@ -236,7 +282,7 @@ class Game {
 
         img.src = `${this.baseUrl}${cardsPerPage[i].image}`;
         textFront.innerHTML = cardsPerPage[i].word;
-        rotate.src = `${this.baseUrl}img/rotate.png`;
+        rotate.src = `${this.baseUrl}img/rotate.gif`;
         cardBody.append(textFront);
         cardBody.append(rotate);
         card.append(img);
@@ -260,6 +306,56 @@ class Game {
         this.isOpen = false;
       }
     });
+  }
+
+  checkCard(cardToFind) {
+    Array.from(document.querySelectorAll('.card-img')).forEach((card) => {
+      card.addEventListener('click', (event) => {
+        if (!event.target.dataset.cardAudio) event.stopPropagation();
+        const check = event.target.dataset.cardAudio === cardToFind.audioSrc;
+        if (check) {
+          this.isWin();
+        } else {
+          this.isLoose();
+        }
+      });
+    });
+  }
+
+  isWin() {
+    this.score_area.append(this.createFullStar());
+    this.getVoice(this.winnerVoice);
+    return false;
+  }
+
+  isLoose() {
+    this.score_area.append(this.createEmptyStar());
+    this.getVoice(this.looseVoice);
+    return false;
+  }
+
+  // create star for winner case
+  createFullStar() {
+    const fullStar = this.createBlock('img');
+    fullStar.classList.add('full');
+    fullStar.src = `${this.baseUrl}img/full_star.png`;
+    // this.score_area.append(fullStar);
+    // this.countWinStars += 1;
+    return fullStar;
+  }
+
+  // create star for loose case
+  createEmptyStar() {
+    const emptyStar = this.createBlock('img');
+    emptyStar.classList.add('empty');
+    emptyStar.src = `${this.baseUrl}img/star.png`;
+    // this.score_area.append(emptyStar);
+    // this.countLooseStars += 1;
+    return emptyStar;
+  }
+
+  getRandomCard(cardsArr) {
+    return cardsArr[Math.floor(Math.random() * cardsArr.length)];
   }
 
   // create navigation menu for sections
@@ -311,14 +407,6 @@ class Game {
   hideMenu() {
     this.nav_icon.classList.toggle('open');
     this.menu.classList.toggle('dark_side_hidden');
-  }
-
-  setButtonArea() {
-
-  }
-
-  setScoreArea() {
-
   }
 
   // generate Element to append

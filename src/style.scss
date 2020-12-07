@@ -24,6 +24,7 @@ body {
   }
   .card-title,
   .rotate {
+    -webkit-backface-visibility: hidden; /* Safari */
     backface-visibility: hidden;
   }
 }
@@ -57,6 +58,7 @@ body {
   }
   .card-title {
     transform: rotateY(180deg);
+    -webkit-backface-visibility: hidden; /* Safari */
     backface-visibility: hidden;
   }
   .rotate {
@@ -72,7 +74,7 @@ body {
 }
 
 .unclickable {
-  // pointer-events: none;
+  pointer-events: none;
 }
 .hide_button {
   // opacity: 0;
@@ -138,6 +140,18 @@ body {
   &::after {
     content: "GAME" !important;
   }
+}
+
+.full {
+  // background-image: url('./assets/img/star-win.svg');
+  width: 60px;
+  height: 60px;
+}
+
+.empty {
+  // background-image: url('./assets/img/star.svg');
+  width: 60px;
+  height: 60px;
 }
 
 /* Burger menu */

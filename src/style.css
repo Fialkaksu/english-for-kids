@@ -7811,6 +7811,8 @@ body {
     cursor: pointer; }
   .card .card-title,
   .card .rotate {
+    -webkit-backface-visibility: hidden;
+    /* Safari */
     backface-visibility: hidden; }
 
 .card-main {
@@ -7836,9 +7838,14 @@ body {
   transform: rotateY(180deg); }
   .rotation .card-title {
     transform: rotateY(180deg);
+    -webkit-backface-visibility: hidden;
+    /* Safari */
     backface-visibility: hidden; }
   .rotation .rotate {
     display: none; }
+
+.unclickable {
+  pointer-events: none; }
 
 .switch {
   position: relative;
@@ -7888,6 +7895,14 @@ body {
     transform: translateX(85px); }
   .game::after {
     content: "GAME" !important; }
+
+.full {
+  width: 60px;
+  height: 60px; }
+
+.empty {
+  width: 60px;
+  height: 60px; }
 
 /* Burger menu */
 .dark_side_of_navigation {
