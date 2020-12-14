@@ -1,6 +1,8 @@
+// Нельзя отключать правила eslint
 /* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
 import 'bootstrap';
+// по условию выполнения нельзя использовать jquery
 import {
   event,
   isWindow
@@ -8,8 +10,11 @@ import {
 import cards from './cards';
 // import Card from './card';
 
+// Весь класс получился очень большим, его трудно понять.
+// Попробуй разбить его на основные компоненты своего приложения, выделить их в отдельные классы
 class Game {
   constructor() {
+    // конструктор получился очень большим, лучше разбить его тело на мелкие методы
     this.body = document.querySelector('body');
     this.main_wrapper = this.createBlock();
 
@@ -185,7 +190,8 @@ class Game {
   getSection(section, mode) {
     const cardsPerPage = section;
     // console.log(cardsPerPage);
-
+    // старайся не дублировать код, я уже где-то похожую строчку видел,
+    // они отличаются только последним классом
     this.main.classList.add('row', 'row-cols-1', 'row-cols-md-2', 'row-cols-lg-3', 'row-cols-xl-4', 'justify-content-center', 'align-items-center', 'section_page');
     this.main.id = cards.indexOf(cardsPerPage);
 
